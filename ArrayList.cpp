@@ -4,7 +4,61 @@
 
 #include "ArrayList.h"
 #include "iostream"
+#include <iterator>
 using namespace std;
+class Exception{
+public:
+    Exception(const string& err)
+    :errMsg(err){}
+    string getError(){
+        return errMsg;
+    }
+private:
+   string errMsg;
+};
+class InvalidIteratorException:public Exception{
+public:
+    InvalidIteratorException(const string& err)
+    :Exception(err){}
+};
+class EmptyListException:public Exception{
+public:
+    EmptyListException(const string& err)
+            :Exception(err){}
+};
+template<typename T>
+T ArrayList<T>::Iterator::operator*() {
+    return array_.array_[index];
+}
+
+template<typename T>
+typename ArrayList<T>::Iterator ArrayList<T>::Iterator::operator++() {
+    if(index == array_.capacity_-1){
+        index == 0;
+    }
+    else{
+        index++;
+    }
+    return ArrayList::Iterator(index, array_);
+}
+template<typename T>
+typename ArrayList<T>::Iterator ArrayList<T>::Iterator::operator--() {
+    if(index == 0){
+        index == array_.capacity-1;
+    }
+    else{
+        index--;
+    }
+    return ArrayList::Iterator(index, array_);
+}
+template<typename T>
+bool ArrayList<T>::Iterator::operator==(Iterator i) {
+if(this == &i){
+    return true;
+}else{
+    return false;
+}
+}
 template<typename T>
 ArrayList<T>::ArrayList(){
     array_ = new T[4];
@@ -88,7 +142,7 @@ void ArrayList<T>::insert(Iterator it, T e) {
     ArrayList<T> temp;
     temp = ArrayList<T>(capacity_);
     for (int j = 0; j < capacity_; ++j) {
-        if(j == it.getI()){
+        if(j == it.index){
             temp.insertBack(e);
         }
         temp.insertBack(array_[j]);
@@ -100,23 +154,36 @@ void ArrayList<T>::insert(Iterator it, T e) {
 }
 template<typename T>
 void ArrayList<T>::removeFront() {
-    if (length_ == 0) throw std::range_error("Array length_ is 0");
+    try {
+        if (length_ == 0) throw EmptyListException("list is empty!");
+    } catch (EmptyListException) {
+        cout<< "caught empty list exception";
+    }
     front_index = ++front_index % capacity_;
     //decrease length
     --length_;
 }
 template<typename T>
 void ArrayList<T>::removeBack() {
-    if (length_ == 0) throw std::range_error("Array length_ is 0");
+    try {
+        if (length_ == 0) throw EmptyListException("list is empty!");
+    }catch(EmptyListException){
+        cout<< "caught empty list exception";
+    }
     --length_;
 }
 
 template<typename T>
 void ArrayList<T>::remove(Iterator i) {
+    try {
+        if (length_ == 0)throw EmptyListException("list is empty!");
+    }catch(EmptyListException){
+        cout <<"caught EmptyListException" << "\n";
+    }
     ArrayList<T> temp;
     temp = ArrayList<T>(capacity_);
     for (int j = 0; j < capacity_; ++j) {
-        if(j == i.getI()){
+        if(j == i.index){
             j++;
         }
         temp.insertBack(array_[j]);
@@ -136,15 +203,16 @@ if(length_ == 0){
 }
 return false;
 }
-template<typename T>
-Iterator ArrayList<T>::begin() {
-    return Iterator(front_index);
-}
-template<typename T>
-Iterator ArrayList<T>::end() {
-    return Iterator(length_);
-}
-template<typename T>
-T Iterator::operator*<T>() {
 
+template<typename T>
+typename ArrayList<T>::Iterator ArrayList<T>::end() {
+    return ArrayList::Iterator(front_index, array_);
 }
+
+template<typename T>
+typename ArrayList<T>::Iterator ArrayList<T>::begin() {
+    return ArrayList::Iterator(length_, ArrayList());
+}
+
+
+
