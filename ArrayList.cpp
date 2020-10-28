@@ -33,12 +33,13 @@ T ArrayList<T>::Iterator::operator*() {
 
 template<typename T>
 typename ArrayList<T>::Iterator ArrayList<T>::Iterator::operator++() {
-    if(index == array_.capacity_-1){
-        index == 0;
-    }
-    else{
+//cout << "array capacity : "<< array_.capacity_<<"\n";
+    if(index >= (array_.capacity_-1)){
+        index = 0;
+    }else{
         index++;
     }
+
     return ArrayList::Iterator(index, array_);
 }
 template<typename T>
@@ -53,7 +54,9 @@ typename ArrayList<T>::Iterator ArrayList<T>::Iterator::operator--() {
 }
 template<typename T>
 bool ArrayList<T>::Iterator::operator==(Iterator i) {
-if(this == &i){
+  //  cout << "this-> index: "<< this->index<<"\n";
+   // cout << "i.index: "<<i.index<<"\n";
+if(this->index == i.index){
     return true;
 }else{
     return false;
@@ -93,17 +96,7 @@ bool ArrayList<T>::resize(const int new_capacity)
     //return statement
     return true;
 }
-template <typename T>
- void ArrayList<T>::copy(T* copy, int capacity_, int length_, int front_index)
-{
-    //create new array in the heap
-    array_ = new T[capacity_];
-    //traverse copy array and copy data organizing array
-    for (auto i{ 0 }; i < length_; ++i)
-    {
-        array_[i] = copy->array_[(copy->front_index + i) % copy->capacity_];
-    }
-}
+
 template <typename T>
 void ArrayList<T>::insertBack(T e) {
 
@@ -206,12 +199,12 @@ return false;
 
 template<typename T>
 typename ArrayList<T>::Iterator ArrayList<T>::end() {
-    return ArrayList::Iterator(front_index, array_);
+    return ArrayList::Iterator(front_index, *this);
 }
 
 template<typename T>
 typename ArrayList<T>::Iterator ArrayList<T>::begin() {
-    return ArrayList::Iterator(length_, ArrayList());
+    return ArrayList::Iterator(length_, *this);
 }
 
 
